@@ -8,14 +8,17 @@ import com.app.ecom.model.User;
 import com.app.ecom.repositories.CartItemRepository;
 import com.app.ecom.repositories.ProductRepository;
 import com.app.ecom.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
@@ -37,7 +40,7 @@ public class CartService {
 
         User user = userOpt.get();
 
-//        if product already exists in cart
+//        to check if product already exists in cart
         CartItem existingCartItem = cartItemRepository.findByUserAndProduct(user, product);
         if(existingCartItem != null){
 //            update quantity
@@ -59,6 +62,30 @@ public class CartService {
 
     public void updateCartItemFromRequest(CartItem cartItem, CartItemRequest request) {
 
+    }
+
+    public boolean deleteItemFromCart(String userId, Long productId) {
+        Optional<Product> productOpt = productRepository.findById(productId);
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+
+        if(productOpt.isPresent() && userOpt.isPresent()) {
+            cartItemRepository.deleteByUserAndProduct(userOpt.get(), productOpt.get());
+            return true;
+        }
+
+//        userOpt.flatMap(user ->
+//            productOpt.map(product -> {
+//                cartItemRepository.deleteByUserAndProduct(user, product);
+//                return true;
+//            })
+//        );
+        return false;
+    }
+
+    public List<CartItem> getCart(String userId) {
+        return userRepository.findById(Long.valueOf(userId))
+                .map(cartItemRepository::findByUser)
+                .orElseGet(List::of);
     }
 
 //    public CartItemResponse mapToCartItemResponse(CartItem cartItem) {
