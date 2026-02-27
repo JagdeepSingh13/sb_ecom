@@ -60,10 +60,6 @@ public class CartService {
         return true;
     }
 
-    public void updateCartItemFromRequest(CartItem cartItem, CartItemRequest request) {
-
-    }
-
     public boolean deleteItemFromCart(String userId, Long productId) {
         Optional<Product> productOpt = productRepository.findById(productId);
         Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
@@ -88,8 +84,10 @@ public class CartService {
                 .orElseGet(List::of);
     }
 
-//    public CartItemResponse mapToCartItemResponse(CartItem cartItem) {
-//
-//    }
+    public void clearCart(String userId) {
+        userRepository.findById(Long.valueOf(userId)).ifPresent(
+                cartItemRepository::deleteByUser
+                );
+    }
 
 }
