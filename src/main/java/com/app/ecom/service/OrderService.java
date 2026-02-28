@@ -76,7 +76,7 @@ public class OrderService {
                                 item.getProduct().getId(),
                                 item.getQuantity(),
                                 item.getPrice(),
-                                item.getPrice().multiply(new BigDecimal(item.getQuantity()))
+                                item.getPrice()//.multiply(new BigDecimal(item.getQuantity()))
                         ))
                         .toList(),
                 order.getCreatedAt()
